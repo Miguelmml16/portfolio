@@ -13,8 +13,7 @@ export const site = {
     github: "https://github.com/Miguelmml16",
     linkedin: "https://www.linkedin.com/in/miguelmedinamml/",
     email: "mailto:miguelmedinamml@outlook.com",
-    // Place your CV at /public/cv/Miguel-Medina-CV.pdf, or update this path.
-    cv: "/cv/Miguel-Medina-CV.pdf", // [Add CV file]
+    cv: "/cv/Miguel-Medina-CV.pdf",
   },
 } as const;
 
