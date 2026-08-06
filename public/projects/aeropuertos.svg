@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" role="img" aria-label="Airport graph cover">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101012"/>
+      <stop offset="1" stop-color="#12161a"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg2)"/>
+  <g stroke="rgba(242,85,107,0.5)" stroke-width="2">
+    <line x1="160" y1="150" x2="360" y2="120"/>
+    <line x1="360" y1="120" x2="560" y2="200"/>
+    <line x1="160" y1="150" x2="300" y2="300"/>
+    <line x1="300" y1="300" x2="560" y2="200"/>
+    <line x1="560" y1="200" x2="660" y2="330"/>
+    <line x1="300" y1="300" x2="660" y2="330"/>
+  </g>
+  <g fill="#0a0a0b" stroke="#f2556b" stroke-width="3">
+    <circle cx="160" cy="150" r="20"/><circle cx="360" cy="120" r="20"/>
+    <circle cx="560" cy="200" r="20"/><circle cx="300" cy="300" r="20"/>
+    <circle cx="660" cy="330" r="20"/>
+  </g>
+  <g fill="#f2556b" font-family="monospace" font-size="12" text-anchor="middle">
+    <text x="160" y="154">GYE</text><text x="360" y="124">UIO</text>
+    <text x="560" y="204">MIA</text><text x="300" y="304">BOG</text><text x="660" y="334">JFK</text>
+  </g>
+  <text x="60" y="410" fill="#ffffff" font-family="monospace" font-size="30" font-weight="700">Airport Graphs</text>
+  <text x="500" y="410" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="16">Java · JavaFX · Dijkstra</text>
+</svg>
