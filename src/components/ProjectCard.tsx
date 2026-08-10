@@ -6,6 +6,8 @@ import { ArrowUpRight, ExternalLink, Github, Star } from "lucide-react";
 import type { Project } from "@/data/projects";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/lib/i18n";
+import { getTranslation } from "@/data/translations";
 
 export function ProjectCard({
   project,
@@ -15,6 +17,9 @@ export function ProjectCard({
   onOpen: (p: Project) => void;
 }) {
   const featured = project.featured;
+  const { lang } = useLanguage();
+  const t = getTranslation(lang).projects;
+  const tr = t.items[project.slug] ?? project;
 
   return (
     <motion.article
@@ -32,7 +37,7 @@ export function ProjectCard({
       <button
         type="button"
         onClick={() => onOpen(project)}
-        aria-label={`Open details for ${project.name}`}
+        aria-label={`Open details for ${tr.name}`}
         className={cn(
           "relative block overflow-hidden bg-ink-800",
           featured ? "aspect-video lg:aspect-auto lg:w-1/2" : "aspect-video w-full",
@@ -41,19 +46,19 @@ export function ProjectCard({
         {project.image ? (
           <Image
             src={project.image}
-            alt={project.imageAlt ?? `${project.name} preview`}
+            alt={project.imageAlt ?? `${tr.name} preview`}
             fill
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : (
           <div className="grid h-full w-full place-items-center text-sm text-white/30">
-            [Add project screenshot]
+            {t.addScreenshot}
           </div>
         )}
         {featured && (
           <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-crimson-600 px-2.5 py-1 text-xs font-semibold text-white shadow-glow">
-            <Star className="h-3 w-3" /> Featured
+            <Star className="h-3 w-3" /> {t.featured}
           </span>
         )}
       </button>
@@ -63,16 +68,16 @@ export function ProjectCard({
         <div className="mb-2 flex flex-wrap gap-1.5">
           {project.category.map((c) => (
             <Badge key={c} tone="crimson">
-              {c}
+              {t.categories[c] ?? c}
             </Badge>
           ))}
         </div>
 
-        <h3 className="text-xl font-semibold text-white">{project.name}</h3>
-        <p className="mt-1 text-sm text-white/50">{project.tagline}</p>
+        <h3 className="text-xl font-semibold text-white">{tr.name}</h3>
+        <p className="mt-1 text-sm text-white/50">{tr.tagline}</p>
 
         <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/65">
-          {project.description}
+          {tr.description}
         </p>
 
         <div className="mt-4 flex flex-wrap gap-1.5">
@@ -97,7 +102,7 @@ export function ProjectCard({
             onClick={() => onOpen(project)}
             className="inline-flex items-center gap-1 text-sm font-medium text-crimson-400 transition-colors hover:text-crimson-300"
           >
-            Details <ArrowUpRight className="h-4 w-4" />
+            {t.details} <ArrowUpRight className="h-4 w-4" />
           </button>
           <span className="text-white/15">·</span>
           <a
@@ -106,7 +111,7 @@ export function ProjectCard({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-sm text-white/60 transition-colors hover:text-white"
           >
-            <Github className="h-4 w-4" /> View Repository
+            <Github className="h-4 w-4" /> {t.viewRepository}
           </a>
           {project.demoUrl && (
             <a
@@ -115,7 +120,7 @@ export function ProjectCard({
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-white/60 transition-colors hover:text-white"
             >
-              <ExternalLink className="h-4 w-4" /> Live Demo
+              <ExternalLink className="h-4 w-4" /> {t.liveDemo}
             </a>
           )}
         </div>

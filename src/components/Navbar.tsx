@@ -2,14 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Github, Linkedin, Menu, X } from "lucide-react";
+import { Github, Languages, Linkedin, Menu, X } from "lucide-react";
 import { navItems, site } from "@/data/site";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/lib/i18n";
+import { getTranslation } from "@/data/translations";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string>("#home");
+  const { lang, toggleLang } = useLanguage();
+  const t = getTranslation(lang);
+  const navLabels: Record<string, string> = {
+    "#home": t.nav.home,
+    "#about": t.nav.about,
+    "#projects": t.nav.projects,
+    "#skills": t.nav.skills,
+    "#experience": t.nav.experience,
+    "#contact": t.nav.contact,
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -75,13 +87,22 @@ export default function Navbar() {
                     : "text-white/60 hover:text-white",
                 )}
               >
-                {item.label}
+                {navLabels[item.href]}
               </a>
             </li>
           ))}
         </ul>
 
         <div className="hidden items-center gap-2 md:flex">
+          <button
+            type="button"
+            onClick={toggleLang}
+            aria-label={t.langToggle.ariaLabel}
+            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            <Languages className="h-4 w-4" />
+            {t.langToggle.label}
+          </button>
           <a
             href={site.links.github}
             target="_blank"
@@ -137,11 +158,20 @@ export default function Navbar() {
                         : "text-white/70 hover:bg-white/5 hover:text-white",
                     )}
                   >
-                    {item.label}
+                    {navLabels[item.href]}
                   </a>
                 </li>
               ))}
               <li className="flex gap-2 px-3 pt-2">
+                <button
+                  type="button"
+                  onClick={toggleLang}
+                  aria-label={t.langToggle.ariaLabel}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-white/70 hover:text-white"
+                >
+                  <Languages className="h-5 w-5" />
+                  {t.langToggle.label}
+                </button>
                 <a
                   href={site.links.github}
                   target="_blank"

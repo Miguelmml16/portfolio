@@ -5,8 +5,10 @@ import { CircleDot, Sparkle, Wrench } from "lucide-react";
 import { skillGroups, type SkillLevel } from "@/data/skills";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/lib/i18n";
+import { getTranslation } from "@/data/translations";
 
-const legend: { level: SkillLevel; icon: typeof Wrench; className: string }[] = [
+const legendIcons: { level: SkillLevel; icon: typeof Wrench; className: string }[] = [
   { level: "Main tools", icon: Wrench, className: "text-crimson-400" },
   { level: "Familiar with", icon: CircleDot, className: "text-white/70" },
   { level: "Currently learning", icon: Sparkle, className: "text-emerald-300/80" },
@@ -19,25 +21,33 @@ const levelStyles: Record<SkillLevel, string> = {
 };
 
 export default function Skills() {
+  const { lang } = useLanguage();
+  const t = getTranslation(lang).skills;
+  const levelLabels: Record<SkillLevel, string> = {
+    "Main tools": t.legend.main,
+    "Familiar with": t.legend.familiar,
+    "Currently learning": t.legend.learning,
+  };
+
   return (
     <section id="skills" className="relative py-24 sm:py-28">
       <div className="pointer-events-none absolute inset-0 bg-grid opacity-30" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
-          eyebrow="Skills"
-          title="Technical toolbox"
-          description="Grouped by how confidently I use each — every item here is backed by a project or coursework, not a self-assigned percentage."
+          eyebrow={t.eyebrow}
+          title={t.title}
+          description={t.description}
         />
 
         {/* Legend */}
         <div className="mb-8 flex flex-wrap gap-4">
-          {legend.map((l) => (
+          {legendIcons.map((l) => (
             <span
               key={l.level}
               className="inline-flex items-center gap-1.5 text-sm text-white/60"
             >
               <l.icon className={cn("h-4 w-4", l.className)} />
-              {l.level}
+              {levelLabels[l.level]}
             </span>
           ))}
         </div>
@@ -53,13 +63,13 @@ export default function Skills() {
               className="card-surface rounded-2xl p-5"
             >
               <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">
-                {group.category}
+                {t.categories[group.category] ?? group.category}
               </h3>
               <ul className="flex flex-wrap gap-2">
                 {group.skills.map((s) => (
                   <li key={s.name}>
                     <span
-                      title={s.level}
+                      title={levelLabels[s.level]}
                       className={cn(
                         "inline-flex items-center rounded-lg border px-2.5 py-1 text-xs font-medium",
                         levelStyles[s.level],

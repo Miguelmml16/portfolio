@@ -12,12 +12,16 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProjectCard } from "@/components/ProjectCard";
 import { ProjectModal } from "@/components/ProjectModal";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/lib/i18n";
+import { getTranslation } from "@/data/translations";
 
 type Filter = "All" | ProjectCategory;
 
 export default function Projects() {
   const [filter, setFilter] = useState<Filter>("All");
   const [selected, setSelected] = useState<Project | null>(null);
+  const { lang } = useLanguage();
+  const t = getTranslation(lang).projects;
 
   // Only show filter chips for categories that actually have projects.
   const availableFilters = useMemo<Filter[]>(() => {
@@ -35,9 +39,9 @@ export default function Projects() {
     <section id="projects" className="relative py-24 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
-          eyebrow="Projects"
-          title="Selected work"
-          description="A few projects that show how I work across AI, backend and the fundamentals. Each opens for a deeper technical look."
+          eyebrow={t.eyebrow}
+          title={t.title}
+          description={t.description}
         />
 
         {/* Filters */}
@@ -57,7 +61,7 @@ export default function Projects() {
                     : "border border-white/10 text-white/60 hover:border-crimson-500/40 hover:text-white",
                 )}
               >
-                {f}
+                {f === "All" ? t.all : t.categories[f] ?? f}
               </button>
             ))}
           </div>

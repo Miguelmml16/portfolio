@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { site } from "@/data/site";
+import { LanguageProvider, type Lang } from "@/lib/i18n";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -63,21 +65,26 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const lang: Lang = cookieStore.get("lang")?.value === "es" ? "es" : "en";
+
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrains.variable}`}>
+    <html lang={lang} className={`${inter.variable} ${jetbrains.variable}`}>
       <body className="min-h-screen bg-ink-950 font-sans antialiased">
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-crimson-600 focus:px-4 focus:py-2 focus:text-white"
-        >
-          Skip to content
-        </a>
-        {children}
+        <LanguageProvider initialLang={lang}>
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-crimson-600 focus:px-4 focus:py-2 focus:text-white"
+          >
+            {lang === "es" ? "Saltar al contenido" : "Skip to content"}
+          </a>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import type { Project } from "@/data/projects";
 import { Badge } from "@/components/ui/Badge";
+import { useLanguage } from "@/lib/i18n";
+import { getTranslation } from "@/data/translations";
 
 export function ProjectModal({
   project,
@@ -20,6 +22,10 @@ export function ProjectModal({
   project: Project | null;
   onClose: () => void;
 }) {
+  const { lang } = useLanguage();
+  const t = getTranslation(lang).projects;
+  const tr = project ? t.items[project.slug] ?? project : null;
+
   useEffect(() => {
     if (!project) return;
     const onKey = (e: KeyboardEvent) => {
@@ -44,7 +50,7 @@ export function ProjectModal({
           onClick={onClose}
           role="dialog"
           aria-modal="true"
-          aria-label={`${project.name} details`}
+          aria-label={`${tr!.name} details`}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 20 }}
@@ -57,7 +63,7 @@ export function ProjectModal({
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close"
+              aria-label={t.modal.close}
               className="absolute right-3 top-3 z-10 rounded-lg bg-ink-950/60 p-2 text-white/70 backdrop-blur transition-colors hover:bg-ink-950 hover:text-white"
             >
               <X className="h-5 w-5" />
@@ -67,7 +73,7 @@ export function ProjectModal({
               <div className="relative aspect-video w-full bg-ink-800">
                 <Image
                   src={project.image}
-                  alt={project.imageAlt ?? `${project.name} preview`}
+                  alt={project.imageAlt ?? `${tr!.name} preview`}
                   fill
                   sizes="(max-width: 768px) 100vw, 768px"
                   className="object-cover"
@@ -80,34 +86,34 @@ export function ProjectModal({
               <div className="mb-2 flex flex-wrap gap-1.5">
                 {project.category.map((c) => (
                   <Badge key={c} tone="crimson">
-                    {c}
+                    {t.categories[c] ?? c}
                   </Badge>
                 ))}
               </div>
-              <h3 className="text-2xl font-bold text-white">{project.name}</h3>
-              <p className="mt-1 text-white/50">{project.tagline}</p>
+              <h3 className="text-2xl font-bold text-white">{tr!.name}</h3>
+              <p className="mt-1 text-white/50">{tr!.tagline}</p>
 
               <div className="mt-6 space-y-6 text-sm leading-relaxed text-white/70">
                 <div>
                   <h4 className="mb-1.5 font-mono text-xs uppercase tracking-wider text-crimson-500">
-                    The problem
+                    {t.modal.problem}
                   </h4>
-                  <p>{project.problem}</p>
+                  <p>{tr!.problem}</p>
                 </div>
 
                 <div>
                   <h4 className="mb-1.5 font-mono text-xs uppercase tracking-wider text-crimson-500">
-                    Overview
+                    {t.modal.overview}
                   </h4>
-                  <p>{project.description}</p>
+                  <p>{tr!.description}</p>
                 </div>
 
                 <div>
                   <h4 className="mb-2 font-mono text-xs uppercase tracking-wider text-crimson-500">
-                    Key features
+                    {t.modal.keyFeatures}
                   </h4>
                   <ul className="space-y-2">
-                    {project.features.map((f) => (
+                    {tr!.features.map((f) => (
                       <li key={f} className="flex gap-2">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-crimson-500" />
                         <span>{f}</span>
@@ -118,10 +124,10 @@ export function ProjectModal({
 
                 <div>
                   <h4 className="mb-2 font-mono text-xs uppercase tracking-wider text-crimson-500">
-                    Technical highlights
+                    {t.modal.technicalHighlights}
                   </h4>
                   <ul className="space-y-2">
-                    {project.highlights.map((h) => (
+                    {tr!.highlights.map((h) => (
                       <li key={h} className="flex gap-2">
                         <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-crimson-500" />
                         <span>{h}</span>
@@ -132,22 +138,22 @@ export function ProjectModal({
 
                 <div>
                   <h4 className="mb-1.5 font-mono text-xs uppercase tracking-wider text-crimson-500">
-                    My role
+                    {t.modal.myRole}
                   </h4>
-                  <p>{project.role}</p>
+                  <p>{tr!.role}</p>
                 </div>
 
                 <div>
                   <h4 className="mb-2 font-mono text-xs uppercase tracking-wider text-crimson-500">
-                    Tech stack
+                    {t.modal.techStack}
                   </h4>
                   <div className="flex flex-wrap gap-1.5">
-                    {project.tech.map((t) => (
+                    {project.tech.map((tech) => (
                       <span
-                        key={t}
+                        key={tech}
                         className="rounded-md bg-white/5 px-2 py-1 font-mono text-xs text-white/70"
                       >
-                        {t}
+                        {tech}
                       </span>
                     ))}
                   </div>
@@ -161,7 +167,7 @@ export function ProjectModal({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-xl bg-crimson-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-crimson-500"
                 >
-                  <Github className="h-4 w-4" /> View Repository
+                  <Github className="h-4 w-4" /> {t.viewRepository}
                 </a>
                 {project.demoUrl && (
                   <a
@@ -170,7 +176,7 @@ export function ProjectModal({
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-4 py-2.5 text-sm font-medium text-white/90 transition-colors hover:border-crimson-500/60"
                   >
-                    <ExternalLink className="h-4 w-4" /> Live Demo
+                    <ExternalLink className="h-4 w-4" /> {t.liveDemo}
                   </a>
                 )}
                 {project.extraRepos?.map((r) => (

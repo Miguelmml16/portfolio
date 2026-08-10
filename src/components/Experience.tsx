@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import {
   Award,
-  BookOpen,
   ExternalLink,
   FolderGit2,
   GraduationCap,
@@ -11,6 +10,8 @@ import {
 } from "lucide-react";
 import { timeline, type TimelineItem } from "@/data/experience";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { useLanguage } from "@/lib/i18n";
+import { getTranslation } from "@/data/translations";
 
 const kindIcon: Record<TimelineItem["kind"], typeof Award> = {
   award: Award,
@@ -20,18 +21,22 @@ const kindIcon: Record<TimelineItem["kind"], typeof Award> = {
 };
 
 export default function Experience() {
+  const { lang } = useLanguage();
+  const t = getTranslation(lang).experience;
+
   return (
     <section id="experience" className="relative py-24 sm:py-28">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <SectionHeading
-          eyebrow="Experience"
-          title="Achievements & involvement"
-          description="Hackathon wins, community work and the academic projects behind the skills above."
+          eyebrow={t.eyebrow}
+          title={t.title}
+          description={t.description}
         />
 
         <ol className="relative border-l border-white/10">
           {timeline.map((item, i) => {
             const Icon = kindIcon[item.kind];
+            const tr = t.items[i] ?? item;
             return (
               <motion.li
                 key={item.title}
@@ -48,15 +53,15 @@ export default function Experience() {
                 <div className="card-surface rounded-xl p-5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="text-base font-semibold text-white">
-                      {item.title}
+                      {tr.title}
                     </h3>
                     <span className="font-mono text-xs text-white/40">
-                      {item.period}
+                      {tr.period}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-sm text-crimson-400">{item.org}</p>
+                  <p className="mt-0.5 text-sm text-crimson-400">{tr.org}</p>
                   <p className="mt-2 text-sm leading-relaxed text-white/65">
-                    {item.description}
+                    {tr.description}
                   </p>
 
                   {item.tags && (
@@ -87,12 +92,6 @@ export default function Experience() {
             );
           })}
         </ol>
-
-        <p className="mt-8 flex items-center gap-2 text-xs text-white/30">
-          <BookOpen className="h-4 w-4" />
-          Dates marked [Add dates] are placeholders — fill them in with your real
-          timeline.
-        </p>
       </div>
     </section>
   );

@@ -15,6 +15,8 @@ import {
 import { site } from "@/data/site";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/lib/i18n";
+import { getTranslation } from "@/data/translations";
 
 type Status = "idle" | "loading" | "success" | "error";
 type Errors = Partial<Record<"name" | "email" | "message", string>>;
@@ -28,15 +30,17 @@ export default function Contact() {
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>("idle");
   const [serverMsg, setServerMsg] = useState<string>("");
+  const { lang } = useLanguage();
+  const t = getTranslation(lang).contact;
 
   function validate(): boolean {
     const e: Errors = {};
-    if (!values.name.trim()) e.name = "Please enter your name.";
-    if (!values.email.trim()) e.email = "Please enter your email.";
-    else if (!emailRe.test(values.email)) e.email = "That email looks invalid.";
-    if (!values.message.trim()) e.message = "Please write a message.";
+    if (!values.name.trim()) e.name = t.errors.name;
+    if (!values.email.trim()) e.email = t.errors.email;
+    else if (!emailRe.test(values.email)) e.email = t.errors.emailInvalid;
+    if (!values.message.trim()) e.message = t.errors.message;
     else if (values.message.trim().length < 10)
-      e.message = "A little more detail, please (10+ characters).";
+      e.message = t.errors.messageShort;
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -55,17 +59,14 @@ export default function Contact() {
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) {
         setStatus("error");
-        setServerMsg(
-          data.error ??
-            "Something went wrong sending your message. Please try again.",
-        );
+        setServerMsg(data.error ?? t.form.errorDefault);
         return;
       }
       setStatus("success");
       setValues({ name: "", email: "", message: "" });
     } catch {
       setStatus("error");
-      setServerMsg("Network error. Please check your connection and retry.");
+      setServerMsg(t.form.networkError);
     }
   }
 
@@ -80,9 +81,9 @@ export default function Contact() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-crimson-700/40 to-transparent" />
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
-          eyebrow="Contact"
-          title="Let's build something"
-          description="Open to internships and software projects. Send a message or reach me directly on any channel below."
+          eyebrow={t.eyebrow}
+          title={t.title}
+          description={t.description}
         />
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.2fr]">
@@ -100,7 +101,7 @@ export default function Contact() {
             >
               <Mail className="h-5 w-5 text-crimson-500" />
               <div>
-                <p className="text-xs text-white/40">Email</p>
+                <p className="text-xs text-white/40">{t.channels.email}</p>
                 <p className="text-sm text-white">{site.email}</p>
               </div>
             </a>
@@ -112,7 +113,7 @@ export default function Contact() {
             >
               <Github className="h-5 w-5 text-crimson-500" />
               <div>
-                <p className="text-xs text-white/40">GitHub</p>
+                <p className="text-xs text-white/40">{t.channels.github}</p>
                 <p className="text-sm text-white">@{site.githubUsername}</p>
               </div>
             </a>
@@ -124,14 +125,14 @@ export default function Contact() {
             >
               <Linkedin className="h-5 w-5 text-crimson-500" />
               <div>
-                <p className="text-xs text-white/40">LinkedIn</p>
+                <p className="text-xs text-white/40">{t.channels.linkedin}</p>
                 <p className="text-sm text-white">in/miguelmedinamml</p>
               </div>
             </a>
             <div className="card-surface flex items-center gap-3 rounded-xl p-4">
               <MapPin className="h-5 w-5 text-crimson-500" />
               <div>
-                <p className="text-xs text-white/40">Location</p>
+                <p className="text-xs text-white/40">{t.channels.location}</p>
                 <p className="text-sm text-white">{site.location}</p>
               </div>
             </div>
@@ -149,7 +150,9 @@ export default function Contact() {
           >
             {/* Honeypot — hidden from users and assistive tech */}
             <div className="pointer-events-none absolute -left-[9999px] top-auto h-0 w-0 overflow-hidden" aria-hidden="true">
-              <label htmlFor="company">Company (leave empty)</label>
+              <label htmlFor="company">
+                {lang === "es" ? "Empresa (dejar vacío)" : "Company (leave empty)"}
+              </label>
               <input
                 id="company"
                 name="company"
@@ -164,7 +167,7 @@ export default function Contact() {
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div className="sm:col-span-1">
                 <label htmlFor="name" className="mb-1.5 block text-sm text-white/70">
-                  Name
+                  {t.form.nameLabel}
                 </label>
                 <input
                   id="name"
@@ -181,7 +184,7 @@ export default function Contact() {
                       ? "border-crimson-500"
                       : "border-white/10 focus:border-crimson-500/60",
                   )}
-                  placeholder="Jane Doe"
+                  placeholder={t.form.namePlaceholder}
                 />
                 {errors.name && (
                   <p id="name-error" className="mt-1 text-xs text-crimson-400">
@@ -192,7 +195,7 @@ export default function Contact() {
 
               <div className="sm:col-span-1">
                 <label htmlFor="email" className="mb-1.5 block text-sm text-white/70">
-                  Email
+                  {t.form.emailLabel}
                 </label>
                 <input
                   id="email"
@@ -209,7 +212,7 @@ export default function Contact() {
                       ? "border-crimson-500"
                       : "border-white/10 focus:border-crimson-500/60",
                   )}
-                  placeholder="jane@company.com"
+                  placeholder={t.form.emailPlaceholder}
                 />
                 {errors.email && (
                   <p id="email-error" className="mt-1 text-xs text-crimson-400">
@@ -223,7 +226,7 @@ export default function Contact() {
                   htmlFor="message"
                   className="mb-1.5 block text-sm text-white/70"
                 >
-                  Message
+                  {t.form.messageLabel}
                 </label>
                 <textarea
                   id="message"
@@ -239,7 +242,7 @@ export default function Contact() {
                       ? "border-crimson-500"
                       : "border-white/10 focus:border-crimson-500/60",
                   )}
-                  placeholder="Tell me about the role, project or idea…"
+                  placeholder={t.form.messagePlaceholder}
                 />
                 {errors.message && (
                   <p id="message-error" className="mt-1 text-xs text-crimson-400">
@@ -257,11 +260,11 @@ export default function Contact() {
               >
                 {status === "loading" ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> Sending…
+                    <Loader2 className="h-4 w-4 animate-spin" /> {t.form.sending}
                   </>
                 ) : (
                   <>
-                    <Send className="h-4 w-4" /> Send message
+                    <Send className="h-4 w-4" /> {t.form.send}
                   </>
                 )}
               </button>
@@ -271,8 +274,7 @@ export default function Contact() {
                   role="status"
                   className="inline-flex items-center gap-1.5 text-sm text-emerald-400"
                 >
-                  <CheckCircle2 className="h-4 w-4" /> Thanks — I&apos;ll get back
-                  to you soon.
+                  <CheckCircle2 className="h-4 w-4" /> {t.form.successMsg}
                 </span>
               )}
               {status === "error" && (
@@ -285,10 +287,7 @@ export default function Contact() {
               )}
             </div>
 
-            <p className="mt-4 text-xs text-white/30">
-              Your details are only used to reply. Nothing is stored in the
-              browser.
-            </p>
+            <p className="mt-4 text-xs text-white/30">{t.form.note}</p>
           </motion.form>
         </div>
       </div>

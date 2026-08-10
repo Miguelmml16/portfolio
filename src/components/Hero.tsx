@@ -4,6 +4,8 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Download, Github, Linkedin, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { site } from "@/data/site";
+import { useLanguage } from "@/lib/i18n";
+import { getTranslation } from "@/data/translations";
 
 const codeLines = [
   { t: "const miguel = {", c: "text-white/50" },
@@ -17,6 +19,8 @@ const codeLines = [
 
 export default function Hero() {
   const reduce = useReducedMotion();
+  const { lang } = useLanguage();
+  const t = getTranslation(lang).hero;
 
   return (
     <section
@@ -42,7 +46,7 @@ export default function Hero() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-crimson-500 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-crimson-500" />
             </span>
-            Open to internships &amp; software projects
+            {t.badge}
           </motion.div>
 
           <motion.h1
@@ -60,7 +64,7 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.12 }}
             className="mt-3 text-xl font-medium text-gradient sm:text-2xl"
           >
-            {site.role}
+            {t.role}
           </motion.p>
 
           <motion.p
@@ -69,10 +73,7 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.18 }}
             className="mt-6 max-w-xl text-base leading-relaxed text-white/60 sm:text-lg"
           >
-            Computer Science student at ESPOL. I build software across the
-            stack — AI agents, FastAPI/Django backends and data-driven
-            interfaces — and I care about systems that stay honest about the
-            data they show. Recently won the Agentic Scale 2026 hackathon.
+            {t.description}
           </motion.p>
 
           <motion.div
@@ -82,10 +83,10 @@ export default function Hero() {
             className="mt-8 flex flex-wrap items-center gap-3"
           >
             <Button href="#projects">
-              View projects <ArrowRight className="h-4 w-4" />
+              {t.viewProjects} <ArrowRight className="h-4 w-4" />
             </Button>
             <Button href={site.links.cv} variant="outline" external>
-              <Download className="h-4 w-4" /> Download CV
+              <Download className="h-4 w-4" /> {t.downloadCV}
             </Button>
             <div className="flex items-center gap-1">
               <a

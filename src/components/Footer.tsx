@@ -1,8 +1,22 @@
+"use client";
+
 import { Github, Heart, Linkedin, Mail } from "lucide-react";
 import { site, navItems } from "@/data/site";
+import { useLanguage } from "@/lib/i18n";
+import { getTranslation } from "@/data/translations";
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { lang } = useLanguage();
+  const t = getTranslation(lang);
+  const navLabels: Record<string, string> = {
+    "#home": t.nav.home,
+    "#about": t.nav.about,
+    "#projects": t.nav.projects,
+    "#skills": t.nav.skills,
+    "#experience": t.nav.experience,
+    "#contact": t.nav.contact,
+  };
 
   return (
     <footer className="border-t border-white/10 bg-ink-950">
@@ -19,8 +33,7 @@ export default function Footer() {
               Miguel Medina
             </a>
             <p className="mt-3 text-sm leading-relaxed text-white/50">
-              Computer Science student at ESPOL, building software that solves
-              real problems — from AI agents to solid backends.
+              {t.footer.description}
             </p>
           </div>
 
@@ -31,7 +44,7 @@ export default function Footer() {
                 href={item.href}
                 className="text-sm text-white/60 transition-colors hover:text-white"
               >
-                {item.label}
+                {navLabels[item.href]}
               </a>
             ))}
           </nav>
@@ -66,13 +79,11 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/40 sm:flex-row">
-          <p>
-            © {year} Miguel Medina. Built to keep shipping real, useful
-            software.
-          </p>
+          <p>{t.footer.rights(year)}</p>
           <p className="inline-flex items-center gap-1.5">
-            Made with <Heart className="h-3.5 w-3.5 text-crimson-500" /> using
-            Next.js &amp; Tailwind CSS
+            {t.footer.madeWithPrefix}{" "}
+            <Heart className="h-3.5 w-3.5 text-crimson-500" />{" "}
+            {t.footer.madeWithSuffix}
           </p>
         </div>
       </div>

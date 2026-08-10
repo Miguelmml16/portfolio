@@ -23,7 +23,7 @@ export const timeline: TimelineItem[] = [
   {
     title: "Student Volunteer",
     org: "IEEE ESPOL Student Branch — Computer Society",
-    period: "[Add dates]",
+    period: "2026 — Present",
     kind: "volunteer",
     description:
       "Volunteer in the IEEE ESPOL Computer Society student branch, taking part in the community's activities and events.",

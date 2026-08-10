@@ -1,6 +1,8 @@
 import { ArrowUpRight, GitFork, Github, Star } from "lucide-react";
 import { site } from "@/data/site";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import type { Lang } from "@/lib/i18n";
+import { getTranslation } from "@/data/translations";
 
 /**
  * Server component. Fetches public GitHub data at build/request time.
@@ -76,8 +78,9 @@ async function getRepos(): Promise<Repo[] | null> {
   }
 }
 
-export default async function GitHubActivity() {
+export default async function GitHubActivity({ lang }: { lang: Lang }) {
   const repos = await getRepos();
+  const t = getTranslation(lang).github;
 
   // Top languages by repo count (public, non-forked).
   const langCount: Record<string, number> = {};
@@ -98,9 +101,9 @@ export default async function GitHubActivity() {
     <section id="github" className="relative py-24 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
-          eyebrow="Activity"
-          title="On GitHub"
-          description="Public repositories, most-used languages and a few highlights. Data comes straight from the GitHub API."
+          eyebrow={t.eyebrow}
+          title={t.title}
+          description={t.description}
         />
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -114,7 +117,7 @@ export default async function GitHubActivity() {
                 </p>
                 {repos && (
                   <p className="text-sm text-white/70">
-                    {publicRepos} public repositories
+                    {t.publicRepos(publicRepos)}
                   </p>
                 )}
               </div>
@@ -122,7 +125,7 @@ export default async function GitHubActivity() {
 
             <div className="mt-6">
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/50">
-                Most used languages
+                {t.mostUsedLanguages}
               </h3>
               {topLanguages.length > 0 ? (
                 <ul className="space-y-2">
@@ -140,10 +143,7 @@ export default async function GitHubActivity() {
                   ))}
                 </ul>
               ) : (
-                <p className="text-sm text-white/40">
-                  Live language data will appear once deployed. Highlights are
-                  shown alongside.
-                </p>
+                <p className="text-sm text-white/40">{t.liveDataFallback}</p>
               )}
             </div>
 
@@ -153,7 +153,7 @@ export default async function GitHubActivity() {
               rel="noopener noreferrer"
               className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-crimson-400 transition-colors hover:text-crimson-300"
             >
-              Visit full profile <ArrowUpRight className="h-4 w-4" />
+              {t.visitProfile} <ArrowUpRight className="h-4 w-4" />
             </a>
           </div>
 
@@ -177,7 +177,7 @@ export default async function GitHubActivity() {
                     <ArrowUpRight className="ml-auto h-4 w-4 text-white/30 transition-colors group-hover:text-crimson-400" />
                   </div>
                   <p className="mt-2 flex-1 text-sm leading-relaxed text-white/60">
-                    {live?.description ?? r.description}
+                    {live?.description ?? t.repos[r.name] ?? r.description}
                   </p>
                   <div className="mt-4 flex items-center gap-4 text-xs text-white/50">
                     <span className="inline-flex items-center gap-1.5">
