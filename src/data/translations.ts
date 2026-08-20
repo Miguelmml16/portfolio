@@ -491,7 +491,7 @@ export const translations = {
             "Sistema en Django para gestionar el catálogo, los socios y los préstamos de una biblioteca comunitaria, con un panel de reportes, autenticación y CRUD completo.",
         },
         {
-          title: "Lic. en Ciencias de la Computación (en curso)",
+          title: "Ing. en Ciencias de la Computación (en curso)",
           org: "ESPOL — Escuela Superior Politécnica del Litoral",
           period: "Guayaquil, Ecuador",
           description:
