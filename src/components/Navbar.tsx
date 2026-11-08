@@ -2,26 +2,47 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Github, Languages, Linkedin, Menu, X } from "lucide-react";
-import { navItems, site } from "@/data/site";
+import { navItems } from "@/data/site";
 import { cn } from "@/lib/utils";
-import { useLanguage } from "@/lib/i18n";
-import { getTranslation } from "@/data/translations";
+import { useLanguage, useT, type Lang } from "@/lib/i18n";
+import { ThemeToggle } from "@/components/ThemeToggle";
+
+// Sections observed for the active-link indicator (includes non-nav ones so
+// the highlight clears when scrolling through them).
+const OBSERVED = ["home", "projects", "experience", "skills", "contact"];
+
+function LangSwitch({ className }: { className?: string }) {
+  const { lang, setLang } = useLanguage();
+  const t = useT();
+  const options: Lang[] = ["en", "es"];
+
+  return (
+    <div role="group" aria-label={t.langToggle.ariaLabel} className={cn("label flex items-center", className)}>
+      {options.map((option, i) => (
+        <span key={option} className="flex items-center">
+          {i > 0 && <span className="mx-1.5 text-subtle">/</span>}
+          <button
+            type="button"
+            onClick={() => setLang(option)}
+            aria-pressed={lang === option}
+            className={cn(
+              "py-2 transition-colors",
+              lang === option ? "text-fg" : "text-subtle hover:text-fg",
+            )}
+          >
+            {option.toUpperCase()}
+          </button>
+        </span>
+      ))}
+    </div>
+  );
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState<string>("#home");
-  const { lang, toggleLang } = useLanguage();
-  const t = getTranslation(lang);
-  const navLabels: Record<string, string> = {
-    "#home": t.nav.home,
-    "#about": t.nav.about,
-    "#projects": t.nav.projects,
-    "#skills": t.nav.skills,
-    "#experience": t.nav.experience,
-    "#contact": t.nav.contact,
-  };
+  const [active, setActive] = useState("#home");
+  const t = useT();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -30,9 +51,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Highlight the section currently in view.
   useEffect(() => {
-    const ids = navItems.map((n) => n.href.replace("#", ""));
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -41,160 +60,99 @@ export default function Navbar() {
       },
       { rootMargin: "-45% 0px -50% 0px" },
     );
-    ids.forEach((id) => {
+    OBSERVED.forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
+    <>
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-300",
-        scrolled
-          ? "border-b border-white/10 bg-ink-950/80 backdrop-blur-lg"
-          : "border-b border-transparent bg-transparent",
+        "fixed inset-x-0 top-0 z-50 transition-colors duration-500",
+        scrolled || open ? "border-b border-line bg-bg/85 backdrop-blur-md" : "border-b border-transparent",
       )}
     >
-      <nav
-        className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6"
-        aria-label="Primary"
-      >
-        <a
-          href="#home"
-          className="group flex items-center gap-2 font-mono text-lg font-bold tracking-tight text-white"
-        >
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-crimson-600 text-white shadow-glow">
-            M
-          </span>
-          <span className="hidden sm:inline">
-            Miguel<span className="text-crimson-500">.</span>
-          </span>
+      <nav aria-label={t.nav.primary} className="container-page flex h-16 items-center justify-between">
+        <a href="#home" className="text-sm font-bold uppercase tracking-tight text-fg">
+          Miguel Medina
         </a>
 
-        {/* Desktop nav */}
-        <ul className="hidden items-center gap-1 md:flex">
+        <ul className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
             <li key={item.href}>
               <a
                 href={item.href}
-                aria-current={active === item.href ? "page" : undefined}
+                aria-current={active === item.href ? "location" : undefined}
                 className={cn(
-                  "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  active === item.href
-                    ? "text-white"
-                    : "text-white/60 hover:text-white",
+                  "link-draw py-1 text-sm transition-colors",
+                  active === item.href ? "text-fg" : "text-muted hover:text-fg",
                 )}
               >
-                {navLabels[item.href]}
+                {t.nav[item.key]}
               </a>
             </li>
           ))}
         </ul>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="flex items-center gap-4">
+          <LangSwitch className="hidden md:flex" />
+          <ThemeToggle />
           <button
             type="button"
-            onClick={toggleLang}
-            aria-label={t.langToggle.ariaLabel}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            className="label -mr-2 px-2 py-3 text-fg md:hidden"
           >
-            <Languages className="h-4 w-4" />
-            {t.langToggle.label}
+            {open ? t.nav.close : t.nav.menu}
           </button>
-          <a
-            href={site.links.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="GitHub profile"
-            className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/5 hover:text-white"
-          >
-            <Github className="h-5 w-5" />
-          </a>
-          <a
-            href={site.links.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LinkedIn profile"
-            className="rounded-lg p-2 text-white/70 transition-colors hover:bg-white/5 hover:text-white"
-          >
-            <Linkedin className="h-5 w-5" />
-          </a>
         </div>
-
-        {/* Mobile toggle */}
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          className="rounded-lg p-2 text-white md:hidden"
-        >
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
       </nav>
+    </header>
 
-      {/* Mobile menu */}
+      {/* Rendered outside <header>: its backdrop-filter would otherwise become
+          the containing block for this fixed overlay and clip it. */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
+            id="mobile-menu"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="overflow-hidden border-t border-white/10 bg-ink-950/95 backdrop-blur-lg md:hidden"
+            className="fixed inset-0 z-40 flex flex-col justify-between bg-bg pt-16 md:hidden"
           >
-            <ul className="space-y-1 px-4 py-4">
-              {navItems.map((item) => (
-                <li key={item.href}>
+            <ul className="container-page pt-8">
+              {navItems.map((item, i) => (
+                <li key={item.href} className="border-b border-line">
                   <a
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className={cn(
-                      "block rounded-lg px-3 py-2.5 text-base font-medium transition-colors",
-                      active === item.href
-                        ? "bg-white/5 text-white"
-                        : "text-white/70 hover:bg-white/5 hover:text-white",
-                    )}
+                    className="display flex items-baseline gap-4 py-4 text-4xl text-fg"
                   >
-                    {navLabels[item.href]}
+                    <span className="label">{String(i + 1).padStart(2, "0")}</span>
+                    {t.nav[item.key]}
                   </a>
                 </li>
               ))}
-              <li className="flex gap-2 px-3 pt-2">
-                <button
-                  type="button"
-                  onClick={toggleLang}
-                  aria-label={t.langToggle.ariaLabel}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-white/70 hover:text-white"
-                >
-                  <Languages className="h-5 w-5" />
-                  {t.langToggle.label}
-                </button>
-                <a
-                  href={site.links.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="GitHub profile"
-                  className="rounded-lg p-2 text-white/70 hover:text-white"
-                >
-                  <Github className="h-5 w-5" />
-                </a>
-                <a
-                  href={site.links.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="LinkedIn profile"
-                  className="rounded-lg p-2 text-white/70 hover:text-white"
-                >
-                  <Linkedin className="h-5 w-5" />
-                </a>
-              </li>
             </ul>
+            <div className="container-page pb-10">
+              <LangSwitch />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }

@@ -1,91 +1,23 @@
 "use client";
 
-import { Github, Heart, Linkedin, Mail } from "lucide-react";
-import { site, navItems } from "@/data/site";
-import { useLanguage } from "@/lib/i18n";
-import { getTranslation } from "@/data/translations";
+import { ArrowUp } from "lucide-react";
+import { site } from "@/data/site";
+import { useT } from "@/lib/i18n";
 
 export default function Footer() {
+  const t = useT();
   const year = new Date().getFullYear();
-  const { lang } = useLanguage();
-  const t = getTranslation(lang);
-  const navLabels: Record<string, string> = {
-    "#home": t.nav.home,
-    "#about": t.nav.about,
-    "#projects": t.nav.projects,
-    "#skills": t.nav.skills,
-    "#experience": t.nav.experience,
-    "#contact": t.nav.contact,
-  };
 
   return (
-    <footer className="border-t border-white/10 bg-ink-950">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-        <div className="flex flex-col items-start justify-between gap-8 md:flex-row">
-          <div className="max-w-sm">
-            <a
-              href="#home"
-              className="flex items-center gap-2 font-mono text-lg font-bold text-white"
-            >
-              <span className="grid h-8 w-8 place-items-center rounded-lg bg-crimson-600 text-white">
-                M
-              </span>
-              Miguel Medina
-            </a>
-            <p className="mt-3 text-sm leading-relaxed text-white/50">
-              {t.footer.description}
-            </p>
-          </div>
-
-          <nav aria-label="Footer" className="grid grid-cols-2 gap-x-10 gap-y-2">
-            {navItems.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="text-sm text-white/60 transition-colors hover:text-white"
-              >
-                {navLabels[item.href]}
-              </a>
-            ))}
-          </nav>
-
-          <div className="flex gap-2">
-            <a
-              href={site.links.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub"
-              className="rounded-xl border border-white/10 p-2.5 text-white/70 transition-colors hover:border-crimson-500/60 hover:text-white"
-            >
-              <Github className="h-5 w-5" />
-            </a>
-            <a
-              href={site.links.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn"
-              className="rounded-xl border border-white/10 p-2.5 text-white/70 transition-colors hover:border-crimson-500/60 hover:text-white"
-            >
-              <Linkedin className="h-5 w-5" />
-            </a>
-            <a
-              href={site.links.email}
-              aria-label="Email"
-              className="rounded-xl border border-white/10 p-2.5 text-white/70 transition-colors hover:border-crimson-500/60 hover:text-white"
-            >
-              <Mail className="h-5 w-5" />
-            </a>
-          </div>
-        </div>
-
-        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/40 sm:flex-row">
-          <p>{t.footer.rights(year)}</p>
-          <p className="inline-flex items-center gap-1.5">
-            {t.footer.madeWithPrefix}{" "}
-            <Heart className="h-3.5 w-3.5 text-crimson-500" />{" "}
-            {t.footer.madeWithSuffix}
-          </p>
-        </div>
+    <footer className="container-page pb-10">
+      <div className="flex flex-col gap-4 border-t border-line pt-6 text-sm sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-muted">
+          {t.footer.rights(year)} <span className="mx-2 text-subtle">/</span> {site.location}
+        </p>
+        <a href="#home" className="group inline-flex items-center gap-1.5 text-muted transition-colors hover:text-fg">
+          {t.footer.backToTop}
+          <ArrowUp className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5" />
+        </a>
       </div>
     </footer>
   );

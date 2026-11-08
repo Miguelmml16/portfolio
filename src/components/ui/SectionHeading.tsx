@@ -1,38 +1,31 @@
-"use client";
+import { Reveal } from "@/components/ui/Reveal";
 
-import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
-
+/**
+ * Section header on a 12-column grid: index + eyebrow in the left rail,
+ * heavy uppercase title (and optional one-line intro) in the main column.
+ */
 export function SectionHeading({
+  index,
   eyebrow,
   title,
   description,
-  className,
 }: {
+  index: string;
   eyebrow: string;
   title: string;
   description?: string;
-  className?: string;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.5 }}
-      className={cn("mb-12 max-w-2xl", className)}
-    >
-      <p className="mb-3 font-mono text-sm font-medium uppercase tracking-widest text-crimson-500">
+    <Reveal className="mb-10 grid grid-cols-1 gap-y-4 border-t border-line pt-6 md:mb-14 md:grid-cols-12 md:gap-x-8">
+      <p className="label md:col-span-3">
+        <span className="text-fg">{index}</span>
+        <span className="mx-2 text-subtle">/</span>
         {eyebrow}
       </p>
-      <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-        {title}
-      </h2>
-      {description && (
-        <p className="mt-4 text-base leading-relaxed text-white/60">
-          {description}
-        </p>
-      )}
-    </motion.div>
+      <div className="md:col-span-9">
+        <h2 className="display text-title text-fg">{title}</h2>
+        {description && <p className="mt-4 max-w-xl text-base leading-relaxed text-muted">{description}</p>}
+      </div>
+    </Reveal>
   );
 }

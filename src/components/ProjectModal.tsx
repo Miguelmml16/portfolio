@@ -1,196 +1,121 @@
 "use client";
 
-import { useEffect } from "react";
-import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  CheckCircle2,
-  ExternalLink,
-  Github,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { X } from "lucide-react";
 import type { Project } from "@/data/projects";
-import { Badge } from "@/components/ui/Badge";
-import { useLanguage } from "@/lib/i18n";
-import { getTranslation } from "@/data/translations";
+import { ProjectLinks } from "@/components/ProjectLinks";
+import { ProjectMedia } from "@/components/ProjectMedia";
+import { useT } from "@/lib/i18n";
 
-export function ProjectModal({
-  project,
-  onClose,
-}: {
-  project: Project | null;
-  onClose: () => void;
-}) {
-  const { lang } = useLanguage();
-  const t = getTranslation(lang).projects;
-  const tr = project ? t.items[project.slug] ?? project : null;
+function Block({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-1 gap-3 border-t border-line py-6 sm:grid-cols-[9rem_1fr] sm:gap-6">
+      <h4 className="label pt-0.5">{label}</h4>
+      <div className="text-sm leading-relaxed text-fg/80">{children}</div>
+    </div>
+  );
+}
+
+function List({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-2.5">
+      {items.map((item) => (
+        <li key={item} className="flex gap-3">
+          <span aria-hidden="true" className="mt-[0.6em] h-px w-3 shrink-0 bg-subtle" />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Side sheet with the full technical write-up of a project. */
+export function ProjectModal({ project, onClose }: { project: Project | null; onClose: () => void }) {
+  const t = useT().projects;
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const copy = project ? t.items[project.slug] : null;
 
   useEffect(() => {
     if (!project) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
+    const trigger = document.activeElement as HTMLElement | null;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
+      trigger?.focus();
     };
   }, [project, onClose]);
 
   return (
     <AnimatePresence>
-      {project && (
+      {project && copy && (
         <motion.div
+          key="overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-ink-950/80 p-4 backdrop-blur-sm sm:items-center sm:p-6"
+          transition={{ duration: 0.3 }}
           onClick={onClose}
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${tr!.name} details`}
+          className="fixed inset-0 z-[60] bg-fg/30 backdrop-blur-[2px]"
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 20 }}
-            transition={{ duration: 0.25 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="project-title"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="relative my-8 w-full max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-ink-900 shadow-2xl sm:my-0"
+            className="absolute inset-y-0 right-0 flex w-full max-w-2xl flex-col bg-bg shadow-[0_0_80px_rgba(0,0,0,0.12)]"
           >
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label={t.modal.close}
-              className="absolute right-3 top-3 z-10 rounded-lg bg-ink-950/60 p-2 text-white/70 backdrop-blur transition-colors hover:bg-ink-950 hover:text-white"
-            >
-              <X className="h-5 w-5" />
-            </button>
+            <div className="flex items-center justify-between border-b border-line px-6 py-4 sm:px-10">
+              <p className="label">{project.category.map((c) => t.categories[c]).join(" · ")}</p>
+              <button
+                ref={closeRef}
+                type="button"
+                onClick={onClose}
+                className="label -mr-2 inline-flex items-center gap-1.5 px-2 py-2 text-fg"
+              >
+                {t.modal.close} <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
 
-            {project.image && (
-              <div className="relative aspect-video w-full bg-ink-800">
-                <Image
-                  src={project.image}
-                  alt={project.imageAlt ?? `${tr!.name} preview`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 768px"
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink-900 to-transparent" />
-              </div>
-            )}
+            <div className="flex-1 overflow-y-auto px-6 pb-12 pt-10 sm:px-10">
+              {project.image && (
+                <ProjectMedia project={project} sizes="(max-width: 672px) 100vw, 672px" className="mb-8" />
+              )}
+              <h3 id="project-title" className="display text-5xl normal-case leading-none text-fg">
+                {copy.name}
+              </h3>
+              {copy.award && <p className="label mt-5 text-fg">{copy.award}</p>}
+              <p className="mb-10 mt-4 text-lg text-muted">{copy.tagline}</p>
 
-            <div className="max-h-[70vh] overflow-y-auto p-6 sm:p-8">
-              <div className="mb-2 flex flex-wrap gap-1.5">
-                {project.category.map((c) => (
-                  <Badge key={c} tone="crimson">
-                    {t.categories[c] ?? c}
-                  </Badge>
-                ))}
-              </div>
-              <h3 className="text-2xl font-bold text-white">{tr!.name}</h3>
-              <p className="mt-1 text-white/50">{tr!.tagline}</p>
-
-              <div className="mt-6 space-y-6 text-sm leading-relaxed text-white/70">
-                <div>
-                  <h4 className="mb-1.5 font-mono text-xs uppercase tracking-wider text-crimson-500">
-                    {t.modal.problem}
-                  </h4>
-                  <p>{tr!.problem}</p>
-                </div>
-
-                <div>
-                  <h4 className="mb-1.5 font-mono text-xs uppercase tracking-wider text-crimson-500">
-                    {t.modal.overview}
-                  </h4>
-                  <p>{tr!.description}</p>
-                </div>
-
-                <div>
-                  <h4 className="mb-2 font-mono text-xs uppercase tracking-wider text-crimson-500">
-                    {t.modal.keyFeatures}
-                  </h4>
-                  <ul className="space-y-2">
-                    {tr!.features.map((f) => (
-                      <li key={f} className="flex gap-2">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-crimson-500" />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="mb-2 font-mono text-xs uppercase tracking-wider text-crimson-500">
-                    {t.modal.technicalHighlights}
-                  </h4>
-                  <ul className="space-y-2">
-                    {tr!.highlights.map((h) => (
-                      <li key={h} className="flex gap-2">
-                        <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-crimson-500" />
-                        <span>{h}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="mb-1.5 font-mono text-xs uppercase tracking-wider text-crimson-500">
-                    {t.modal.myRole}
-                  </h4>
-                  <p>{tr!.role}</p>
-                </div>
-
-                <div>
-                  <h4 className="mb-2 font-mono text-xs uppercase tracking-wider text-crimson-500">
-                    {t.modal.techStack}
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {project.tech.map((tech) => (
-                      <span
-                        key={tech}
-                        className="rounded-md bg-white/5 px-2 py-1 font-mono text-xs text-white/70"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-3 border-t border-white/10 pt-6">
-                <a
-                  href={project.repoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl bg-crimson-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-crimson-500"
-                >
-                  <Github className="h-4 w-4" /> {t.viewRepository}
-                </a>
-                {project.demoUrl && (
-                  <a
-                    href={project.demoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-4 py-2.5 text-sm font-medium text-white/90 transition-colors hover:border-crimson-500/60"
-                  >
-                    <ExternalLink className="h-4 w-4" /> {t.liveDemo}
-                  </a>
-                )}
-                {project.extraRepos?.map((r) => (
-                  <a
-                    key={r.url}
-                    href={r.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-4 py-2.5 text-sm font-medium text-white/70 transition-colors hover:border-crimson-500/60 hover:text-white"
-                  >
-                    <Github className="h-4 w-4" /> {r.label}
-                  </a>
-                ))}
-              </div>
+              <Block label={t.modal.problem}>
+                <p>{copy.problem}</p>
+              </Block>
+              <Block label={t.modal.overview}>
+                <p>{copy.description}</p>
+              </Block>
+              <Block label={t.modal.keyFeatures}>
+                <List items={copy.features} />
+              </Block>
+              <Block label={t.modal.technicalHighlights}>
+                <List items={copy.highlights} />
+              </Block>
+              <Block label={t.modal.myRole}>
+                <p>{copy.role}</p>
+              </Block>
+              <Block label={t.modal.techStack}>
+                <p className="font-mono text-xs leading-loose">{project.tech.join("  ·  ")}</p>
+              </Block>
+              <Block label={t.modal.links}>
+                <ProjectLinks links={project.links} className="space-y-2" />
+              </Block>
             </div>
           </motion.div>
         </motion.div>

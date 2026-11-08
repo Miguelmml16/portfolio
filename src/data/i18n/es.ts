@@ -1,0 +1,223 @@
+import type { Dictionary } from "./types";
+
+export const es: Dictionary = {
+  skipLink: "Saltar al contenido",
+  nav: {
+    projects: "Trabajo",
+    experience: "Experiencia",
+    skills: "Skills",
+    contact: "Contacto",
+    menu: "Menú",
+    close: "Cerrar",
+    primary: "Principal",
+  },
+  langToggle: { ariaLabel: "Cambiar a inglés" },
+  theme: { toDark: "Cambiar a modo noche", toLight: "Cambiar a modo día" },
+  hero: {
+    greeting: "Hola, soy",
+    role: "Cofundador de aLata · Ciencias de la Computación en ESPOL",
+    intro: [
+      "Cofundador de ",
+      { b: "aLata" },
+      ". Construyo ",
+      { b: "apps móviles, backends y agentes de IA" },
+      " — desde el modelo de datos hasta producción. ",
+      { b: "1er lugar" },
+      " en el hackathon Agentic Scale 2026. Ciencias de la Computación en ",
+      { b: "ESPOL" },
+      ".",
+    ],
+    status: "Abierto a pasantías",
+    contactMe: "Contáctame",
+    downloadCV: "Descargar CV",
+    photoAlt: "Miguel Medina apoyado en un muro de piedra",
+  },
+  projects: {
+    index: "01",
+    title: "Trabajo seleccionado",
+    description:
+      "Una startup que cofundé, el proyecto con el que ganamos un hackathon y dos que muestran los fundamentos. Abre cualquiera para ver el detalle técnico.",
+    openDetails: (name) => `Ver detalles de ${name}`,
+    imageAlt: (name) => `Captura de ${name}`,
+    imageSoon: "Imagen próximamente",
+    details: "Ver detalle",
+    linkLabels: {
+      web: "Sitio web",
+      appStore: "App Store",
+      googlePlay: "Google Play",
+      instagram: "Instagram",
+      repo: "Repositorio",
+      demo: "Demo en vivo",
+      award: "La victoria",
+    },
+    categories: {
+      Startup: "Startup",
+      Mobile: "Móvil",
+      AI: "IA",
+      "Full Stack": "Full Stack",
+      Backend: "Backend",
+      Java: "Java",
+      "Data Structures": "Estructuras de Datos",
+    },
+    modal: {
+      problem: "El problema",
+      overview: "Resumen",
+      keyFeatures: "Funcionalidades clave",
+      technicalHighlights: "Aspectos técnicos",
+      myRole: "Mi rol",
+      techStack: "Stack",
+      links: "Enlaces",
+      close: "Cerrar",
+    },
+    items: {
+      alata: {
+        name: "aLata",
+        roleShort: "Cofundador",
+        period: "2026 — Presente",
+        tagline: "Carpooling universitario en Guayaquil — disponible en App Store y Google Play.",
+        problem:
+          "Llegar al campus es un gasto diario para los estudiantes en Guayaquil. aLata permite que los estudiantes que manejan compartan los gastos de su ruta con estudiantes verificados de su propia universidad.",
+        description:
+          "Una plataforma de carpooling que conecta a estudiantes conductores y pasajeros en Guayaquil, Ecuador. Los conductores publican sus rutas, los pasajeros buscan y reservan un cupo, y un conductor solo se aprueba después de revisar a mano sus documentos y su vehículo. Es un producto en producción: app para iOS y Android, una API en Express + PostgreSQL con actualizaciones en tiempo real, una landing web y un panel de administración interno.",
+        features: [
+          "Registro solo con correo institucional universitario, con códigos de verificación",
+          "Alta de conductores con revisión manual de documentos y vehículo antes de poder publicar rutas",
+          "Publicación de rutas y reserva de cupos, con cancelación hasta 10 minutos antes de la salida",
+          "Chat dentro de la app entre pasajero y conductor, y reseñas después de cada viaje",
+          "Actualizaciones en tiempo real con Socket.io y mapas con el recorrido de la ruta",
+          "Panel de administración interno con roles y permisos del equipo",
+        ],
+        role: "Cofundador. Construyo con el equipo en todo el producto — la app en React Native + Expo, la API en Express + PostgreSQL y el panel de administración. Entre otras cosas: el flujo de registro (búsqueda de universidad, búsqueda de marca y año del vehículo con validación, aceptación explícita de términos y política de privacidad), el sistema de roles y permisos del equipo y las rutas a demanda.",
+        highlights: [
+          "Un producto real, publicado en App Store y Google Play — versiones que pasan por la revisión de Apple y Google, no una tarea de clase.",
+          "Permisos validados en el servidor: el menú del panel se adapta a cada rol, pero cada acción se vuelve a validar en la API.",
+          "Confianza integrada en el flujo: correos institucionales, revisión de documentos para conductores y aceptación de términos registrada.",
+        ],
+      },
+      brokeate: {
+        name: "Brokeate",
+        roleShort: "Desarrollador · equipo ganador",
+        period: "2026",
+        award: "1er lugar entre 60+ equipos · Agentic Scale 2026 · premio de US$1.000",
+        tagline: "Roboasesor con un asesor humano en el circuito de decisión.",
+        problem:
+          "El asesoramiento de inversión automatizado tiende a inventar cifras y actuar sin supervisión. Brokeate mantiene a un asesor humano en control y prohíbe que la IA produzca cualquier cifra que la base de datos no pueda respaldar.",
+        description:
+          "Una plataforma de roboasesoría construida en 48 horas para el hackathon Agentic Scale de TAWS durante el Ecuador Tech Week (Track 3: Robo-Advisory), donde ganó el primer lugar. Un cliente responde un cuestionario de riesgo, el sistema califica su perfil en la base de datos, arma una propuesta de portafolio a partir del catálogo del banco, y un asesor humano la aprueba, edita o rechaza antes de que sea definitiva. Un agente conversacional con LangGraph explica las cifras pero nunca las inventa.",
+        features: [
+          "Perfilamiento de riesgo calculado en Postgres (no en el cliente ni en el LLM), con un desglose transparente de respuesta → puntos → umbral",
+          "Propuestas de portafolio explicables con montos en USD calculados en SQL, riesgo esperado y calificaciones crediticias por emisor",
+          "Cola de revisión del asesor con estados deterministas (aprobar / editar / rechazar), cada decisión auditada con fecha, versión de reglas y responsable",
+          "Subcuentas que dividen el capital total entre metas, garantizado por un trigger de Postgres contra condiciones de carrera",
+          "Agente LangGraph con un grafo de estados de 3 rutas y salvaguardas anti-alucinación; intercambiable entre proveedores (Gemini / OpenAI / Anthropic)",
+          "Módulo de mercados externos (Alpha Vantage) con caché de 1 hora y respaldo simulado determinista, más un feed de GNews y un bot de WhatsApp con Twilio",
+        ],
+        role: "Desarrollador en el equipo ganador. El trabajo se repartió equitativamente entre el grupo — contribuí tanto al front-end (la app en React Native y el cliente web en React) como al backend en FastAPI + Postgres, además de la capa de IA (el agente LangGraph y sus salvaguardas anti-alucinación).",
+        highlights: [
+          "Anti-alucinación por diseño: cada texto generado se valida contra un 'contexto permitido' cerrado; si el modelo inventa un valor, el texto se descarta, se reintenta una vez y luego recurre a una plantilla determinista.",
+          "Reglas de negocio aplicadas en la base de datos mediante triggers y columnas GENERATED, de modo que las garantías se mantienen incluso frente a SQL directo, no solo desde el código de la aplicación.",
+          "Backend en capas bien definidas: las rutas solo manejan HTTP, los controladores contienen la lógica de negocio, los servicios son dueños del motor de IA — con un conjunto de pruebas en pytest que corre contra la base de datos real con datos de prueba.",
+        ],
+      },
+      "gestion-de-aeropuertos": {
+        name: "Airport Graph",
+        roleShort: "Autor único",
+        period: "Proyecto académico",
+        tagline: "Algoritmos de grafos sobre aeropuertos y rutas de vuelo, visualizados en vivo.",
+        problem:
+          "Los algoritmos clásicos de grafos son difíciles de entender como pseudocódigo. Esta aplicación de escritorio modela aeropuertos y vuelos como un grafo dirigido y anima cada algoritmo en un lienzo interactivo.",
+        description:
+          "Una aplicación de escritorio en Java 21 + JavaFX que modela aeropuertos y rutas de vuelo como un grafo dirigido con lista de adyacencia. Gestiona los datos, calcula rutas, y ejecuta y visualiza algoritmos clásicos de grafos en un lienzo interactivo con zoom. Construida para un curso de Estructuras de Datos como una versión refactorizada y extendida del proyecto original.",
+        features: [
+          "Grafo dirigido con lista de adyacencia — búsqueda de vértices O(1) respaldada por un LinkedHashMap",
+          "BFS, DFS, Dijkstra (cola de prioridad con eliminación diferida), componentes débil/fuertemente conexos (Kosaraju) y árbol de expansión mínima (Kruskal + Union-Find)",
+          "Patrón Strategy para el peso de las aristas — cambia entre tiempo, distancia y costo, recalculando cada algoritmo ponderado al instante",
+          "Lienzo interactivo: arrastra nodos, haz zoom, desplázate, y animaciones con código de colores por algoritmo",
+          "Importación/exportación CSV, y cuentas de usuario con hash PBKDF2-HMAC-SHA256 persistidas en disco",
+        ],
+        role: "Autor único. Diseñé el núcleo de estructuras de datos, la interfaz en JavaFX y el conjunto de pruebas en JUnit 5.",
+        highlights: [
+          "El núcleo de estructuras de datos se mantiene totalmente independiente de JavaFX, lo que lo hace directamente testeable con pruebas unitarias (GraphALTest cubre Dijkstra, BFS/DFS, componentes y MST).",
+          "Arquitectura en capas (domain / graph / index / repo / service / persistence / auth / ui) con un único servicio orquestando el grafo, un índice TreeMap/TreeSet y la estrategia de peso.",
+          "Mejoras algorítmicas concretas sobre el original: búsqueda de vértices O(1), Dijkstra sin eliminación O(n) de la cola, y contraseñas con hash y sal en lugar de texto plano.",
+        ],
+      },
+      bibliored: {
+        name: "BiblioRed",
+        roleShort: "Autor",
+        period: "Proyecto académico",
+        tagline: "Sistema de gestión de bibliotecas en Django con CRUD completo y reportes.",
+        problem:
+          "Las bibliotecas comunitarias necesitan llevar el control de su catálogo, socios y préstamos en un solo lugar. BiblioRed ofrece un sistema web completo para gestionar los tres.",
+        description:
+          "Una aplicación web en Django para gestionar bibliotecas comunitarias, organizada en tres módulos — catálogo, socios y préstamos — más un panel de reportes, autenticación y CRUD completo. Construida para un curso de Desarrollo de Aplicaciones Web y Móviles, con una interfaz en Bootstrap 5 y una ruta de migración limpia de SQLite a MySQL.",
+        features: [
+          "Tres apps de Django: catálogo (categorías, autores, libros, ejemplares), socios y préstamos",
+          "CRUD completo en todas las entidades, más un panel de reportes protegido por inicio de sesión",
+          "Regla de negocio automática: registrar un préstamo marca el ejemplar como prestado y calcula la fecha de vencimiento a +15 días; una devolución lo vuelve a marcar como disponible",
+          "Autenticación y panel de administración de Django",
+          "Persistencia configurable — inicia en SQLite y migra a MySQL cambiando el bloque de configuración",
+        ],
+        role: "Autor. Modelé el dominio, implementé los módulos CRUD y la lógica de negocio de préstamo/devolución en la capa de modelos.",
+        highlights: [
+          "El ciclo de vida del préstamo se maneja directamente en el método save() del modelo (sin signals), como lo requería la asignación.",
+          "Separación clara en apps enfocadas, cada una dueña de sus propios modelos.",
+          "Diseño agnóstico de base de datos con una migración documentada a MySQL.",
+        ],
+      },
+    },
+  },
+  experience: {
+    index: "02",
+    title: "Experiencia",
+    items: {
+      alata: {
+        title: "Cofundador",
+        org: "aLata · Carpooling universitario",
+        period: "2026 — Presente",
+        description: "Construyo la app móvil, la API y el panel de administración de una app de carpooling disponible en iOS y Android.",
+        linkLabel: "alata-ec.com",
+      },
+      "agentic-scale": {
+        title: "1er lugar — Hackathon Agentic Scale",
+        org: "TAWS · Ecuador Tech Week",
+        period: "Jul 2026",
+        description: "Ganamos entre 60+ equipos con Brokeate, un roboasesor con IA construido en 48 horas.",
+        linkLabel: "La victoria",
+      },
+      ieee: {
+        title: "Voluntario estudiantil",
+        org: "IEEE ESPOL · Computer Society",
+        period: "2026 — Presente",
+        description: "Apoyo en las actividades y eventos de la rama estudiantil.",
+      },
+    },
+    educationTitle: "Educación",
+    education: {
+      title: "Ing. en Ciencias de la Computación",
+      org: "ESPOL — Escuela Superior Politécnica del Litoral",
+      period: "Graduación prevista: feb. 2028",
+    },
+    languagesTitle: "Idiomas",
+    languages: [
+      { name: "Español", level: "Nativo" },
+      { name: "Inglés", level: "B2 · Michigan English Test" },
+      { name: "Francés", level: "Básico" },
+    ],
+  },
+  skills: {
+    index: "03",
+    title: "Skills",
+  },
+  contact: {
+    eyebrow: "¿Tienes un proyecto o una oportunidad?",
+    title: "Conectemos.",
+    copy: "Copiar",
+    copied: "Copiado",
+    channels: { github: "GitHub", linkedin: "LinkedIn", instagram: "Instagram", whatsapp: "WhatsApp", cv: "CV" },
+  },
+  footer: {
+    rights: (year) => `© ${year} Miguel Medina`,
+    backToTop: "Volver arriba",
+  },
+};

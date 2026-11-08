@@ -1,32 +1,33 @@
-import { cookies } from "next/headers";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import About from "@/components/About";
 import Projects from "@/components/Projects";
-import Skills from "@/components/Skills";
 import Experience from "@/components/Experience";
-import GitHubActivity from "@/components/GitHubActivity";
+import Skills from "@/components/Skills";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import type { Lang } from "@/lib/i18n";
+import GalaxyBackground from "@/components/GalaxyBackground";
+import DaySkyBackground from "@/components/DaySkyBackground";
 
-export default async function HomePage() {
-  const cookieStore = await cookies();
-  const lang: Lang = cookieStore.get("lang")?.value === "es" ? "es" : "en";
-
+export default function HomePage() {
   return (
     <>
+      {/* Skies: dusk by day, galaxy at night (each hidden in the other mode via CSS). */}
+      <DaySkyBackground />
+      <GalaxyBackground />
       <Navbar />
       <main id="main">
         <Hero />
-        <About />
         <Projects />
-        <Skills />
         <Experience />
-        <GitHubActivity lang={lang} />
-        <Contact />
+        <Skills />
+        {/* Inverted block in day mode; transparent over the sky at night. */}
+        <div className="theme-ink text-fg">
+          <Contact />
+        </div>
       </main>
-      <Footer />
+      <div className="theme-ink text-fg">
+        <Footer />
+      </div>
     </>
   );
 }

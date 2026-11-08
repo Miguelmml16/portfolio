@@ -1,296 +1,74 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Github,
-  Linkedin,
-  Loader2,
-  Mail,
-  MapPin,
-  Send,
-} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, Check, Copy, Download, Github, Instagram, Linkedin, MessageCircle } from "lucide-react";
 import { site } from "@/data/site";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { cn } from "@/lib/utils";
-import { useLanguage } from "@/lib/i18n";
-import { getTranslation } from "@/data/translations";
+import { Reveal } from "@/components/ui/Reveal";
+import { useT } from "@/lib/i18n";
 
-type Status = "idle" | "loading" | "success" | "error";
-type Errors = Partial<Record<"name" | "email" | "message", string>>;
-
-const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const COPIED_MS = 2000;
 
 export default function Contact() {
-  const [values, setValues] = useState({ name: "", email: "", message: "" });
-  // Honeypot: bots fill this hidden field; humans never see it.
-  const [company, setCompany] = useState("");
-  const [errors, setErrors] = useState<Errors>({});
-  const [status, setStatus] = useState<Status>("idle");
-  const [serverMsg, setServerMsg] = useState<string>("");
-  const { lang } = useLanguage();
-  const t = getTranslation(lang).contact;
+  const c = useT().contact;
+  const [copied, setCopied] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout>>();
 
-  function validate(): boolean {
-    const e: Errors = {};
-    if (!values.name.trim()) e.name = t.errors.name;
-    if (!values.email.trim()) e.email = t.errors.email;
-    else if (!emailRe.test(values.email)) e.email = t.errors.emailInvalid;
-    if (!values.message.trim()) e.message = t.errors.message;
-    else if (values.message.trim().length < 10)
-      e.message = t.errors.messageShort;
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  }
+  useEffect(() => () => clearTimeout(timer.current), []);
 
-  async function onSubmit(ev: React.FormEvent) {
-    ev.preventDefault();
-    setServerMsg("");
-    if (!validate()) return;
-    setStatus("loading");
+  async function copyEmail() {
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, company }),
-      });
-      const data = (await res.json()) as { ok?: boolean; error?: string };
-      if (!res.ok || !data.ok) {
-        setStatus("error");
-        setServerMsg(data.error ?? t.form.errorDefault);
-        return;
-      }
-      setStatus("success");
-      setValues({ name: "", email: "", message: "" });
+      await navigator.clipboard.writeText(site.email);
+      setCopied(true);
+      clearTimeout(timer.current);
+      timer.current = setTimeout(() => setCopied(false), COPIED_MS);
     } catch {
-      setStatus("error");
-      setServerMsg(t.form.networkError);
+      // Clipboard blocked (permissions / insecure context): open the mail client instead.
+      window.location.href = site.links.email;
     }
   }
 
-  function field(name: keyof typeof values, value: string) {
-    setValues((v) => ({ ...v, [name]: value }));
-    if (errors[name]) setErrors((e) => ({ ...e, [name]: undefined }));
-    if (status !== "idle") setStatus("idle");
-  }
+  const channels = [
+    { label: c.channels.github, href: site.links.github, icon: Github },
+    { label: c.channels.linkedin, href: site.links.linkedin, icon: Linkedin },
+    { label: c.channels.instagram, href: site.links.instagram, icon: Instagram },
+    { label: c.channels.whatsapp, href: site.links.whatsapp, icon: MessageCircle },
+  ];
 
   return (
-    <section id="contact" className="relative py-24 sm:py-28">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-crimson-700/40 to-transparent" />
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeading
-          eyebrow={t.eyebrow}
-          title={t.title}
-          description={t.description}
-        />
+    <section id="contact" className="container-page pb-16 pt-24 md:pt-32">
+      <Reveal>
+        <p className="label">{c.eyebrow}</p>
+        <h2 className="display mt-4 text-display text-fg">{c.title}</h2>
+      </Reveal>
 
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.2fr]">
-          {/* Left: direct channels */}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.5 }}
-            className="space-y-3"
-          >
-            <a
-              href={site.links.email}
-              className="card-surface flex items-center gap-3 rounded-xl p-4 transition-colors hover:border-crimson-500/40"
-            >
-              <Mail className="h-5 w-5 text-crimson-500" />
-              <div>
-                <p className="text-xs text-white/40">{t.channels.email}</p>
-                <p className="text-sm text-white">{site.email}</p>
-              </div>
-            </a>
-            <a
-              href={site.links.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="card-surface flex items-center gap-3 rounded-xl p-4 transition-colors hover:border-crimson-500/40"
-            >
-              <Github className="h-5 w-5 text-crimson-500" />
-              <div>
-                <p className="text-xs text-white/40">{t.channels.github}</p>
-                <p className="text-sm text-white">@{site.githubUsername}</p>
-              </div>
-            </a>
-            <a
-              href={site.links.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="card-surface flex items-center gap-3 rounded-xl p-4 transition-colors hover:border-crimson-500/40"
-            >
-              <Linkedin className="h-5 w-5 text-crimson-500" />
-              <div>
-                <p className="text-xs text-white/40">{t.channels.linkedin}</p>
-                <p className="text-sm text-white">in/miguelmedinamml</p>
-              </div>
-            </a>
-            <div className="card-surface flex items-center gap-3 rounded-xl p-4">
-              <MapPin className="h-5 w-5 text-crimson-500" />
-              <div>
-                <p className="text-xs text-white/40">{t.channels.location}</p>
-                <p className="text-sm text-white">{site.location}</p>
-              </div>
-            </div>
-          </motion.div>
+      <Reveal delay={0.1} className="mt-14 flex flex-col gap-5 border-t border-line pt-10 sm:flex-row sm:items-center sm:justify-between">
+        <a href={site.links.email} className="link-draw break-words text-[clamp(1.1rem,5.2vw,2.25rem)] font-bold tracking-tight text-fg">
+          {site.email}
+        </a>
+        <button
+          type="button"
+          onClick={copyEmail}
+          className="pill shrink-0 self-start sm:self-auto"
+          aria-live="polite"
+        >
+          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          {copied ? c.copied : c.copy}
+        </button>
+      </Reveal>
 
-          {/* Right: form */}
-          <motion.form
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            onSubmit={onSubmit}
-            noValidate
-            className="card-surface relative rounded-2xl p-6 sm:p-8"
-          >
-            {/* Honeypot — hidden from users and assistive tech */}
-            <div className="pointer-events-none absolute -left-[9999px] top-auto h-0 w-0 overflow-hidden" aria-hidden="true">
-              <label htmlFor="company">
-                {lang === "es" ? "Empresa (dejar vacío)" : "Company (leave empty)"}
-              </label>
-              <input
-                id="company"
-                name="company"
-                type="text"
-                tabIndex={-1}
-                autoComplete="off"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <div className="sm:col-span-1">
-                <label htmlFor="name" className="mb-1.5 block text-sm text-white/70">
-                  {t.form.nameLabel}
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  value={values.name}
-                  onChange={(e) => field("name", e.target.value)}
-                  aria-invalid={!!errors.name}
-                  aria-describedby={errors.name ? "name-error" : undefined}
-                  className={cn(
-                    "w-full rounded-xl border bg-ink-950/60 px-4 py-2.5 text-sm text-white placeholder-white/30 transition-colors focus:outline-none",
-                    errors.name
-                      ? "border-crimson-500"
-                      : "border-white/10 focus:border-crimson-500/60",
-                  )}
-                  placeholder={t.form.namePlaceholder}
-                />
-                {errors.name && (
-                  <p id="name-error" className="mt-1 text-xs text-crimson-400">
-                    {errors.name}
-                  </p>
-                )}
-              </div>
-
-              <div className="sm:col-span-1">
-                <label htmlFor="email" className="mb-1.5 block text-sm text-white/70">
-                  {t.form.emailLabel}
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  value={values.email}
-                  onChange={(e) => field("email", e.target.value)}
-                  aria-invalid={!!errors.email}
-                  aria-describedby={errors.email ? "email-error" : undefined}
-                  className={cn(
-                    "w-full rounded-xl border bg-ink-950/60 px-4 py-2.5 text-sm text-white placeholder-white/30 transition-colors focus:outline-none",
-                    errors.email
-                      ? "border-crimson-500"
-                      : "border-white/10 focus:border-crimson-500/60",
-                  )}
-                  placeholder={t.form.emailPlaceholder}
-                />
-                {errors.email && (
-                  <p id="email-error" className="mt-1 text-xs text-crimson-400">
-                    {errors.email}
-                  </p>
-                )}
-              </div>
-
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="message"
-                  className="mb-1.5 block text-sm text-white/70"
-                >
-                  {t.form.messageLabel}
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={5}
-                  value={values.message}
-                  onChange={(e) => field("message", e.target.value)}
-                  aria-invalid={!!errors.message}
-                  aria-describedby={errors.message ? "message-error" : undefined}
-                  className={cn(
-                    "w-full resize-none rounded-xl border bg-ink-950/60 px-4 py-2.5 text-sm text-white placeholder-white/30 transition-colors focus:outline-none",
-                    errors.message
-                      ? "border-crimson-500"
-                      : "border-white/10 focus:border-crimson-500/60",
-                  )}
-                  placeholder={t.form.messagePlaceholder}
-                />
-                {errors.message && (
-                  <p id="message-error" className="mt-1 text-xs text-crimson-400">
-                    {errors.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-6 flex flex-wrap items-center gap-4">
-              <button
-                type="submit"
-                disabled={status === "loading"}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-crimson-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-crimson-500 hover:shadow-glow disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {status === "loading" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> {t.form.sending}
-                  </>
-                ) : (
-                  <>
-                    <Send className="h-4 w-4" /> {t.form.send}
-                  </>
-                )}
-              </button>
-
-              {status === "success" && (
-                <span
-                  role="status"
-                  className="inline-flex items-center gap-1.5 text-sm text-emerald-400"
-                >
-                  <CheckCircle2 className="h-4 w-4" /> {t.form.successMsg}
-                </span>
-              )}
-              {status === "error" && (
-                <span
-                  role="alert"
-                  className="inline-flex items-center gap-1.5 text-sm text-crimson-400"
-                >
-                  <AlertCircle className="h-4 w-4" /> {serverMsg}
-                </span>
-              )}
-            </div>
-
-            <p className="mt-4 text-xs text-white/30">{t.form.note}</p>
-          </motion.form>
-        </div>
-      </div>
+      <Reveal delay={0.15} className="mt-8 flex flex-wrap gap-3">
+        {channels.map(({ label, href, icon: Icon }) => (
+          <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="pill">
+            <Icon className="h-4 w-4" />
+            {label}
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </a>
+        ))}
+        <a href={site.links.cv} target="_blank" rel="noopener noreferrer" className="pill">
+          <Download className="h-4 w-4" />
+          {c.channels.cv}
+        </a>
+      </Reveal>
     </section>
   );
 }

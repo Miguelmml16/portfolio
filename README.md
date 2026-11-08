@@ -1,11 +1,12 @@
 # Miguel Medina — Personal Portfolio
 
-A modern, dark-themed portfolio for **Miguel Medina**, Computer Science student at
-ESPOL (Guayaquil, Ecuador) and software developer. Built to present real projects to
-recruiters, tech companies and internship programs.
+A minimal, monochrome (black · white · gray) editorial portfolio for **Miguel Medina**,
+Computer Science student at ESPOL (Guayaquil, Ecuador) and software developer. Built to
+present real projects to recruiters, tech companies and internship programs.
 
-Live sections: Hero, About, Projects (with category filters and detail modals),
-Skills, Experience timeline, live GitHub activity, and a working contact form.
+Sections: Hero (short intro + photo), Work (detail side sheet per project), Experience
+with education and languages, a scrolling skills marquee, and Contact — in English and
+Spanish, with a day / night toggle.
 
 ---
 
@@ -13,10 +14,11 @@ Skills, Experience timeline, live GitHub activity, and a working contact form.
 
 - **Next.js 14** (App Router) + **React 18**
 - **TypeScript** (strict, no implicit `any`)
-- **Tailwind CSS** for styling + a small design-token layer
+- **Tailwind CSS** with CSS-variable color tokens (`bg`, `fg`, `muted`, `subtle`, `line`);
+  night mode swaps the variables, and the `theme-ink` class always shows the opposite palette
+- **Schibsted Grotesk / IBM Plex Mono** via `next/font`
 - **Framer Motion** for subtle, `prefers-reduced-motion`-aware animations
 - **Lucide React** icons
-- **Resend** (optional) for the contact form email delivery
 - Deploy target: **Vercel**
 
 ## Highlights
@@ -24,9 +26,9 @@ Skills, Experience timeline, live GitHub activity, and a working contact form.
 - Fully responsive (mobile, tablet, desktop) with a sticky, adaptive navbar
 - Accessible: semantic landmarks, skip link, focus-visible rings, `aria-*`, keyboard-closable modal
 - SEO-ready: metadata, canonical URL, Open Graph (auto-generated), `sitemap.xml`, `robots.txt`, favicon
-- Live GitHub section that reads the public GitHub API and degrades gracefully offline
-- Contact form with client + server validation, loading / success / error states, and a honeypot
-- No secrets in the client; all keys live in server-side environment variables
+- Day / night mode: follows the OS by default; an explicit choice is stored in a cookie
+  and applied server-side, so there is no flash of the wrong theme
+- Contact: email with one-click copy, plus GitHub, LinkedIn, WhatsApp and CV
 
 ---
 
@@ -35,13 +37,11 @@ Skills, Experience timeline, live GitHub activity, and a working contact form.
 ```
 portfolio/
 ├── public/
-│   ├── miguel.png                # profile photo (replace as you like)
-│   ├── cv/                       # put Miguel-Medina-CV.pdf here
-│   └── projects/                 # project cover images (SVG placeholders included)
+│   ├── miguel.png                # profile photo (shown in grayscale)
+│   └── cv/Miguel-Medina-CV.pdf   # "Download CV" target
 ├── src/
 │   ├── app/
-│   │   ├── api/contact/route.ts  # contact form endpoint (server-side)
-│   │   ├── globals.css
+│   │   ├── globals.css           # palette (day / night / theme-ink)
 │   │   ├── icon.svg              # favicon
 │   │   ├── layout.tsx            # metadata, fonts, <html> shell
 │   │   ├── opengraph-image.tsx   # auto-generated OG image
@@ -49,21 +49,25 @@ portfolio/
 │   │   ├── robots.ts
 │   │   └── sitemap.ts
 │   ├── components/
-│   │   ├── ui/                   # Button, Badge, SectionHeading
-│   │   ├── Navbar.tsx  Hero.tsx  About.tsx
-│   │   ├── Projects.tsx  ProjectCard.tsx  ProjectModal.tsx
-│   │   ├── Skills.tsx  Experience.tsx  GitHubActivity.tsx
-│   │   └── Contact.tsx  Footer.tsx
-│   ├── data/                     # content lives here — edit these to update the site
-│   │   ├── site.ts  projects.ts  skills.ts  experience.ts
-│   └── lib/utils.ts
+│   │   ├── ui/                   # ButtonLink, Reveal, RichText, SectionHeading
+│   │   ├── Navbar.tsx  ThemeToggle.tsx  Hero.tsx
+│   │   ├── Projects.tsx  ProjectRow.tsx  ProjectLinks.tsx  ProjectModal.tsx
+│   │   ├── Experience.tsx  Skills.tsx  Contact.tsx  Footer.tsx
+│   │   └── MotionProvider.tsx
+│   ├── data/
+│   │   ├── site.ts  projects.ts  skills.ts  experience.ts   # structure: links, tech, order
+│   │   └── i18n/                 # all visible copy: en.ts, es.ts (+ types.ts)
+│   └── lib/                      # i18n context (useT), utils
 ├── .env.example
 ├── tailwind.config.ts
 └── next.config.mjs
 ```
 
-All copy and data are centralized in `src/data/*`. To update projects, skills or the
-timeline, edit those files — no component changes needed.
+Content is split in two layers:
+
+- **Structure** (`src/data/*.ts`): project slugs, tech stacks, repo/demo links, timeline order.
+- **Copy** (`src/data/i18n/en.ts` and `es.ts`): every visible text, keyed by project slug
+  or timeline id. `types.ts` makes the build fail if the Spanish dictionary misses a key.
 
 ---
 
@@ -99,40 +103,24 @@ Open <http://localhost:3000>.
 
 ## Environment variables
 
-Copy `.env.example` to `.env.local`. All are optional and the app degrades gracefully.
+Copy `.env.example` to `.env.local`. The only variable is optional:
 
-| Variable                        | Required | Purpose                                                                 |
-| ------------------------------- | -------- | ----------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`          | No       | Canonical URL used in metadata / sitemap.                               |
-| `NEXT_PUBLIC_GITHUB_USERNAME`   | No       | GitHub username for the activity section (defaults to `Miguelmml16`).   |
-| `GITHUB_TOKEN`                  | No       | Server-side PAT to raise GitHub API rate limits (60 → 5000 req/h).      |
-| `RESEND_API_KEY`                | No       | Enables the contact form to send email via Resend.                      |
-| `CONTACT_TO_EMAIL`              | No       | Address that receives contact messages.                                 |
-| `CONTACT_FROM_EMAIL`            | No       | Verified Resend sender (e.g. `onboarding@resend.dev` while testing).    |
-
-> Without `RESEND_API_KEY` / `CONTACT_TO_EMAIL`, the contact form returns a clear
-> "not configured yet" message instead of crashing.
-
-### Enabling the contact form
-
-1. Create a free account at [resend.com](https://resend.com) and generate an API key.
-2. Add `RESEND_API_KEY` and `CONTACT_TO_EMAIL` to `.env.local` (and to Vercel).
-3. For a custom `CONTACT_FROM_EMAIL`, verify your domain in Resend; otherwise keep
-   `onboarding@resend.dev` for testing.
+| Variable               | Required | Purpose                                                      |
+| ---------------------- | -------- | ------------------------------------------------------------ |
+| `NEXT_PUBLIC_SITE_URL` | No       | Canonical URL used in metadata, sitemap and Open Graph image. |
 
 ---
 
 ## Personalize it
 
-- **Photo** — replace `public/miguel.png`.
-- **CV** — add `public/cv/Miguel-Medina-CV.pdf` (see the `[Add CV file]` markers).
-- **Projects** — edit `src/data/projects.ts`. Set `demoUrl` only when a demo exists,
-  and add screenshots to `public/projects/` then point `image` at them.
-- **Skills / Experience** — edit `src/data/skills.ts` and `src/data/experience.ts`.
-  Replace any `[Add dates]` placeholders with your real timeline.
-- **Colors / fonts** — tweak `tailwind.config.ts` and the fonts in `src/app/layout.tsx`.
-
-Search the codebase for `[Add ...]` to find every intentional placeholder.
+- **Photo** — replace `public/miguel.png` (shown in grayscale, cropped from the left at 4:5).
+- **CV** — replace `public/cv/Miguel-Medina-CV.pdf`.
+- **Projects** — add the entry in `src/data/projects.ts` (set `demoUrl` only when a demo
+  exists) and its text under `projects.items` in both `i18n/en.ts` and `i18n/es.ts`.
+- **Skills / Experience** — `src/data/skills.ts`; timeline entries in
+  `src/data/experience.ts` with their text under `experience.items` in both dictionaries.
+- **Colors / fonts** — the palette is in `src/app/globals.css` (`:root` and `.theme-ink`),
+  fonts in `src/app/layout.tsx`.
 
 ---
 
@@ -142,7 +130,7 @@ Search the codebase for `[Add ...]` to find every intentional placeholder.
 2. Go to [vercel.com/new](https://vercel.com/new) and **Import** the repository.
 3. Vercel auto-detects Next.js — keep the defaults (Build: `next build`, Output: `.next`).
 4. Under **Settings → Environment Variables**, add any variables you use
-   (`NEXT_PUBLIC_SITE_URL`, `GITHUB_TOKEN`, `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, …).
+   (`NEXT_PUBLIC_SITE_URL`).
 5. Click **Deploy**. Every push to the main branch redeploys automatically.
 
 CLI alternative:
@@ -166,6 +154,10 @@ After deploying, set `NEXT_PUBLIC_SITE_URL` to your final domain so metadata,
 - Minimal dependencies to keep bundles small.
 
 ---
+
+## Credits
+
+- Moon surface: LRO albedo map from NASA SVS CGI Moon Kit (public domain), in `public/textures/moon-albedo.jpg`.
 
 ## License
 
