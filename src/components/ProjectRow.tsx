@@ -31,7 +31,7 @@ export function ProjectRow({
   return (
     <Reveal as="li" className="group relative border-b border-line">
       <div className="grid grid-cols-1 gap-y-6 py-8 md:grid-cols-12 md:gap-x-8 md:py-10">
-        <div className="flex gap-4 md:col-span-3 md:block">
+        <div className="flex gap-4 md:col-span-3 md:block lg:col-span-2">
           <p className="font-mono text-sm text-fg">{String(index).padStart(2, "0")}</p>
           <div className="md:mt-4">
             <p className="text-sm text-fg">{copy.roleShort}</p>
@@ -50,11 +50,11 @@ export function ProjectRow({
           </button>
         </div>
 
-        <div className="md:order-3 md:col-span-4">
-          <ProjectMedia project={project} sizes="(max-width: 768px) 100vw, 33vw" />
+        <div className="md:order-3 md:col-span-4 lg:col-span-6">
+          <ProjectMedia project={project} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 33vw, 50vw" />
         </div>
 
-        <div className="md:order-2 md:col-span-5">
+        <div className="md:order-2 md:col-span-5 lg:col-span-4">
           <h3>
             <button
               type="button"
